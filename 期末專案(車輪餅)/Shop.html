@@ -235,7 +235,7 @@ header{
 
 <div class="page">
   <header>
-    <a class="back-btn" href="./index.html" title="返回首頁">
+    <a class="back-btn" href="./index.php" title="返回首頁">
       <svg viewBox="0 0 24 24">
         <line x1="19" y1="12" x2="5" y2="12"/>
         <polyline points="12 19 5 12 12 5"/>
@@ -310,15 +310,16 @@ import * as THREE from 'three';
 import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+// scale 欄位：調整每個產品的模型顯示大小倍率（預設 1.0）
 const PRODUCTS = [
-  { id:'p1', name:'大腸麵線', desc:'鮮香Q彈，古早味道',       emoji:'🍜', price:60,  modelUrl:'big1.glb' },
-  { id:'p2', name:'紅豆',     desc:'飽滿蜜紅豆，甜而不膩',     emoji:'🫘', price:45,  modelUrl:'red.glb' },
-  { id:'p3', name:'奶油',     desc:'法式奶油，濃醇滑順',       emoji:'🧈', price:50,  modelUrl:'butter1.glb' },
-  { id:'p4', name:'芒果',     desc:'台灣愛文芒果，香甜多汁',   emoji:'🥭', price:75,  modelUrl:'mango.glb' },
-  { id:'p5', name:'巧克力',   desc:'比利時黑巧克力，層次豐富', emoji:'🍫', price:65,  modelUrl:'chocolate.glb' },
-  { id:'p6', name:'香菜',     desc:'新鮮香菜，清爽獨特',       emoji:'🌿', price:40,  modelUrl:'webcam.glb' },
-  { id:'p7', name:'納豆',     desc:'健康發酵，風味獨特',       emoji:'🫙', price:55,  modelUrl:'nana.glb' },
-  { id:'p8', name:'榴槤',     desc:'貓山王榴槤，王者風味',     emoji:'🍈', price:120, modelUrl:'lolo.glb' },
+  { id:'p1', name:'大腸麵線', desc:'鮮香Q彈，古早味道',       emoji:'🍜', price:60,  modelUrl:'big1.glb',       scale:4.0 },
+  { id:'p2', name:'紅豆',     desc:'飽滿蜜紅豆，甜而不膩',     emoji:'🫘', price:45,  modelUrl:'red.glb',        scale:4.0 },
+  { id:'p3', name:'奶油',     desc:'法式奶油，濃醇滑順',       emoji:'🧈', price:50,  modelUrl:'butter2.glb',    scale:4.0 },
+  { id:'p4', name:'芒果',     desc:'台灣愛文芒果，香甜多汁',   emoji:'🥭', price:75,  modelUrl:'mango.glb',      scale:4.0 },
+  { id:'p5', name:'巧克力',   desc:'比利時黑巧克力，層次豐富', emoji:'🍫', price:65,  modelUrl:'chocolate.glb',  scale:4.0 },
+  { id:'p6', name:'香菜',     desc:'新鮮香菜，清爽獨特',       emoji:'🌿', price:40,  modelUrl:'webcam.glb',     scale:4.0 },
+  { id:'p7', name:'納豆',     desc:'健康發酵，風味獨特',       emoji:'🫙', price:55,  modelUrl:'nana.glb',       scale:4.0 },
+  { id:'p8', name:'榴槤',     desc:'貓山王榴槤，王者風味',     emoji:'🍈', price:120, modelUrl:'lolo.glb',       scale:4.0 },
 ];
 
 let cart = {};
@@ -410,7 +411,6 @@ canvas.addEventListener('click', e => {
   const dist = Math.hypot(e.clientX - mouseDownX, e.clientY - mouseDownY);
   if (dist > 5 || !currentModel || squeezed) return;
 
-  /* 彈跳動畫 */
   squeezed = true;
   const dur1 = 200, dur2 = 350, t0 = performance.now();
   function squishDown(now) {
@@ -433,7 +433,6 @@ canvas.addEventListener('click', e => {
   }
   requestAnimationFrame(squishDown);
 
-  /* GLB 動畫播放一次 */
   if (mixer && currentActions.length > 0) {
     controls.autoRotate = false;
     currentActions.forEach(a => {
@@ -448,6 +447,7 @@ canvas.addEventListener('click', e => {
 });
 
 const loader = new GLTFLoader();
+
 function loadProductModel(product) {
   if (mixer) { mixer.stopAllAction(); mixer = null; }
   currentActions = [];
@@ -479,7 +479,11 @@ function loadProductModel(product) {
     const box    = new THREE.Box3().setFromObject(model);
     const size   = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    baseScale = 1.8 / Math.max(size.x, size.y, size.z);
+
+    // 套用每個產品的自訂縮放倍率
+    const productScale = product.scale ?? 1.0;
+    baseScale = (1.8 / Math.max(size.x, size.y, size.z)) * productScale;
+
     model.scale.setScalar(baseScale);
     model.position.sub(center.multiplyScalar(baseScale));
     scene.add(model);
