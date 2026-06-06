@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海陸紅豆餅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #1a1a1a;
+  --ink-2:  #3a3a3a;
+  --ink-3:  #000000;
+  --ink-4:  #0b0b0b;
+  --surface:#f5f4f1;
+  --white:  #ffffff;
+  --border: rgba(0,0,0,0.09);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+#bg-video {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.50;
+  filter: grayscale(100%) contrast(1.15);
+}
+
+.overlay {
+  position: fixed; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 70% at 60% 40%, rgba(210,210,205,0.22) 0%, transparent 65%),
+    linear-gradient(160deg, rgba(245,244,241,0.15) 0%, rgba(245,244,241,0.60) 100%);
+  pointer-events: none;
+}
+
+.page {
+  position: relative; z-index: 2;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ══ LEFT ══ */
+.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 52px 56px 48px;
+  border-right: 1px solid var(--border);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.1s ease forwards;
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.year-tag {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--ink-4);
+}
+
+.hero-display {
+  opacity: 0;
+  animation: fadeUp 0.8s 0.25s ease forwards;
+}
+
+.hero-display h1 {       
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 7.5vw, 88px);
+  font-weight: 900;
+  line-height: 1.0;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.hero-display h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.hero-sub {
+  margin-top: 24px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-3);
+  max-width: 340px;
+  font-weight: 300;
+}
+
+.bottom-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.45s ease forwards;
+}
+
+.flavor-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-4);
+  letter-spacing: 0.08em;
+}
+
+.tag-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  flex-shrink: 0;
+}
+
+.cta-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.3s ease;
+}
+.cta-arrow:hover { transform: translateY(-4px); }
+.cta-arrow:hover .arrow-circle { background: var(--ink); }
+.cta-arrow:hover .arrow-icon { stroke: var(--white); }
+
+.cta-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.arrow-circle {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  background: transparent;
+}
+
+.arrow-icon {
+  width: 22px; height: 22px;
+  stroke: var(--ink);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s ease;
+  transform: rotate(-45deg);
+}
+
+/* ══ RIGHT ══ */
+.right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.right-visual {
+  flex: 1;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 1s 0.5s ease forwards;
+}
+
+/* 裝飾數字 */
+.deco-num {
+  position: absolute;
+  bottom: 52px;
+  right: 24px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(80px, 12vw, 140px);
+  font-weight: 900;
+  color: rgba(255,255,255,0.18);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: -0.04em;
+  z-index: 3;
+}
+
+/* ── 圖片：填滿整個 right-visual ── */
+.visual-img-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+#visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: opacity 0.8s ease;
+}
+
+/* 佔位框（src 為空時顯示）*/
+.visual-img-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  background: rgba(238,237,233,0.6);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.placeholder-icon {
+  width: 40px; height: 40px;
+  stroke: rgba(0,0,0,0.18); fill: none;
+  stroke-width: 1.4; stroke-linecap: round;
+}
+.placeholder-text {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.22);
+}
+
+/* 名稱＋價格：疊在圖片底部 */
+.visual-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0 28px 52px;
+  /* 下方漸層遮罩，讓文字可讀 */
+  background: linear-gradient(to top,
+    rgba(26,26,26,0.55) 0%,
+    rgba(26,26,26,0.15) 40%,
+    transparent 70%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.visual-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  transition: opacity 0.4s;
+}
+
+.visual-price {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* 輪播點：右下角 */
+.item-dots {
+  position: absolute;
+  bottom: 24px;
+  right: 28px;
+  display: flex;
+  gap: 6px;
+  z-index: 4;
+}
+.item-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  opacity: 0.5;
+  transition: opacity 0.4s, transform 0.4s, background 0.4s;
+  cursor: pointer;
+}
+.item-dot.active {
+  opacity: 1;
+  background: #fff;
+  transform: scale(1.5);
+}
+
+/* ── 底部資訊欄 ── */
+.right-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 160px;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.65s ease forwards;
+  flex-shrink: 0;
+}
+
+.info-block {
+  padding: 24px 24px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgba(245,244,241,0.7);
+  backdrop-filter: blur(8px);
+}
+.info-block:last-child { border-right: none; }
+
+.info-label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.info-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 100px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  left: 100px;
+}
+
+.info-unit {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Scroll line ── */
+.scroll-line {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--ink-4));
+  z-index: 10;
+  opacity: 0;
+  animation: fadeIn 1s 1s ease forwards;
+}
+
+/* ── Nav dots ── */
+.nav-dots {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeIn 0.8s 0.9s ease forwards;
+}
+.nav-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+.nav-dot:first-child {
+  background: var(--ink);
+  width: 4px; height: 12px;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="./bg.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+<div class="scroll-line"></div>
+
+<nav class="nav-dots">
+  <div class="nav-dot"></div>
+  <div class="nav-dot"></div>
+  <div class="nav-dot"></div>
+</nav>
+
+<div class="page">
+
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+
+    <div class="top-row">
+      <span class="eyebrow">海陸 · 紅豆餅</span>
+      <span class="year-tag">Est. 2026</span>
+    </div>
+
+    <div class="hero-display">
+      <h1>
+        海陸紅豆餅
+      </h1>
+      <p class="hero-sub">
+        精選台灣在地食材，每日現烤現賣。<br>
+        八種口味，傳遞二十年的古早滋味。
+      </p>
+    </div>
+
+    <div class="bottom-row">
+      <div class="flavor-tags">
+        <div class="tag-item"></span>紅豆 · 奶油 · 芒果</div>
+        <div class="tag-item"></span>巧克力 · 大腸麵線</div>
+        <div class="tag-item"></span>香菜 · 納豆 · 榴槤</div>
+      </div>
+
+      <a class="cta-arrow" href="./Shop.php">
+        <span class="cta-label">立即選購</span>
+        <div class="arrow-circle">
+          <svg class="arrow-icon" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+  </div><!-- /left -->
+
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+
+    <div class="right-visual">
+
+      <!-- 全滿圖片層 -->
+      <div class="visual-img-wrap" id="visual-img-wrap">
+        <img id="visual-img" src="o1.png" alt="紅豆">
+        <div class="visual-img-placeholder" id="visual-placeholder" style="display:none;">
+          <svg class="placeholder-icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span class="placeholder-text">待置入圖片</span>
+        </div>
+      </div>
+
+      <!-- 裝飾數字 -->
+      <div class="deco-num" id="deco-num">01</div>
+
+      <!-- 輪播點 -->
+      <div class="item-dots" id="item-dots"></div>
+
+    </div>
+
+
+
+<script>
+const ITEMS = [
+  { name:'紅豆',     price:45,  img:'o1.png' },
+  { name:'奶油',     price:50,  img:'o2.png' },
+  { name:'芒果',     price:75,  img:'o3.png' },
+  { name:'巧克力',   price:65,  img:'o4.png' },
+  { name:'大腸麵線', price:60,  img:'o5.png' },
+  { name:'香菜',     price:40,  img:'o6.png' },
+  { name:'納豆',     price:55,  img:'o7.png' },
+  { name:'榴槤',     price:120, img:'o8.png' },
+];
+
+let current = 0;
+const imgEl       = document.getElementById('visual-img');
+const placeholder = document.getElementById('visual-placeholder');
+const decoEl      = document.getElementById('deco-num');
+const dotsEl      = document.getElementById('item-dots');
+
+/* 建立輪播點 */
+ITEMS.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'item-dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(d);
+});
+
+function goTo(idx) {
+  current = idx;
+  const item = ITEMS[idx];
+
+  /* 淡出 */
+  imgEl.style.opacity  = '0';
+
+  setTimeout(() => {
+    if (item.img) {
+      imgEl.src = item.img;
+      imgEl.alt = item.name;
+      imgEl.style.opacity  = '1';
+      placeholder.style.display = 'none';
+    } else {
+      imgEl.src = '';
+      imgEl.style.opacity  = '0';
+      placeholder.style.display = 'flex';
+    }
+
+    decoEl.textContent  = String(idx + 1).padStart(2, '0');
+  }, 500);
+
+  dotsEl.querySelectorAll('.item-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === idx)
+  );
+}
+
+goTo(0);
+setInterval(() => goTo((current + 1) % ITEMS.length), 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海陸紅豆餅 — 選購</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:     #1a1a1a;
+  --ink-2:   #3a3a3a;
+  --ink-3:   #6b6b6b;
+  --ink-4:   #9e9e9e;
+  --surface: #f5f4f1;
+  --surface2:#eeede9;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.16);
+  --white:   #ffffff;
+  --glass:   rgba(255,255,255,0.55);
+  --glass-b: rgba(255,255,255,0.80);
+  --blur:    blur(16px);
+  --radius:  14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Noto Sans TC',sans-serif;
+  background:var(--surface);
+  color:var(--ink);
+  height:100vh;
+  overflow:hidden;
+}
+
+#bg-video{
+  position:fixed;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  z-index:0;
+  opacity:0.50;
+  filter:grayscale(100%) contrast(1.1);
+}
+.overlay{
+  position:fixed;inset:0;z-index:1;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 50%, rgba(200,200,200,0.12) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(245,244,241,0.18) 0%, rgba(245,244,241,0.55) 100%);
+  pointer-events:none;
+}
+
+.page{
+  position:relative;z-index:2;
+  height:100vh;
+  display:grid;
+  grid-template-rows:auto 1fr;
+}
+
+/* ── Header ── */
+header{
+  padding:18px 40px;
+  display:flex;align-items:center;gap:18px;
+  border-bottom:1px solid var(--border);
+  background:rgba(245,244,241,0.75);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  animation:fadeUp 0.5s ease both;
+  flex-shrink:0;
+}
+.back-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--border2);background:var(--glass);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  cursor:pointer;text-decoration:none;color:var(--ink);flex-shrink:0;
+  transition:background 0.2s,transform 0.2s;
+}
+.back-btn:hover{background:var(--glass-b);transform:translateX(-2px);}
+.back-btn svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.header-title{flex:1;display:flex;flex-direction:column;gap:2px;}
+.header-title-main{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--ink);letter-spacing:0.01em;}
+.header-title-sub{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-4);}
+.cart-fab{
+  display:flex;align-items:center;gap:9px;
+  background:var(--glass);border:1px solid var(--border2);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  color:var(--ink-2);border-radius:50px;padding:8px 18px;
+  font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;
+  transition:background 0.2s,transform 0.15s;
+}
+.cart-fab:hover:not(:disabled){background:var(--glass-b);transform:translateY(-1px);}
+.cart-fab:disabled{opacity:0.35;cursor:not-allowed;}
+.cart-count{
+  background:var(--ink-2);color:var(--white);
+  border-radius:50%;width:20px;height:20px;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ══ Body ══ */
+.body{
+  display:grid;
+  grid-template-columns:200px 1fr 300px;
+  overflow:hidden;
+  animation:fadeUp 0.5s 0.08s ease both;
+}
+
+/* ── Flavor sidebar ── */
+.flavor-sidebar{
+  border-right:1px solid var(--border);
+  background:rgba(245,244,241,0.60);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  display:flex;flex-direction:column;padding:28px 20px;gap:6px;overflow-y:auto;
+}
+.flavor-sidebar::-webkit-scrollbar{width:0;}
+.sidebar-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px;padding-left:2px;}
+.flavor-tag{
+  display:flex;align-items:center;gap:10px;
+  background:transparent;color:var(--ink-3);
+  border:1px solid transparent;padding:9px 12px;border-radius:10px;
+  font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:all 0.18s;text-align:left;width:100%;
+}
+.flavor-tag:hover{background:rgba(255,255,255,0.7);border-color:var(--border2);color:var(--ink);}
+.flavor-tag.active{background:var(--ink);border-color:var(--ink);color:var(--white);}
+.flavor-tag-emoji{font-size:16px;flex-shrink:0;}
+.flavor-tag-price{margin-left:auto;font-size:11px;font-weight:400;opacity:0.6;}
+.flavor-tag.active .flavor-tag-price{opacity:0.7;}
+
+/* ── Showcase ── */
+.showcase-wrap{
+  position:relative;overflow:hidden;
+  background:rgba(238,237,233,0.30);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#preview-canvas{
+  position:absolute;inset:0;
+  width:100%!important;height:100%!important;
+  display:block;cursor:grab;user-select:none;
+}
+#preview-canvas.rotating{cursor:grabbing;}
+#loading-hint{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;pointer-events:none;
+}
+.loading-spinner{
+  width:28px;height:28px;
+  border:2px solid rgba(0,0,0,0.08);
+  border-top-color:var(--ink-3);
+  border-radius:50%;animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:11px;color:var(--ink-4);letter-spacing:0.1em;text-transform:uppercase;}
+.product-name-label{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  font-family:'Playfair Display',serif;font-size:18px;font-weight:700;
+  color:var(--ink);text-shadow:0 1px 10px rgba(255,255,255,0.9);
+  pointer-events:none;white-space:nowrap;letter-spacing:0.02em;
+}
+
+/* ── Right panel ── */
+.panel{
+  border-left:1px solid var(--border);
+  background:rgba(245,244,241,0.60);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  display:flex;flex-direction:column;gap:0;overflow-y:auto;
+}
+.panel::-webkit-scrollbar{width:0;}
+.panel-section{padding:24px;border-bottom:1px solid var(--border);}
+.panel-section:last-child{border-bottom:none;}
+.section-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-4);margin-bottom:12px;}
+.product-price{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--ink);line-height:1;}
+.product-price-unit{font-size:14px;color:var(--ink-4);font-family:'Noto Sans TC',sans-serif;margin-left:3px;}
+.product-desc{margin-top:10px;font-size:13px;color:var(--ink-3);line-height:1.75;}
+.qty-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px;}
+.qty-row{
+  display:flex;align-items:center;
+  background:rgba(255,255,255,0.5);border-radius:10px;overflow:hidden;
+  border:1px solid rgba(0,0,0,0.08);
+}
+.qty-btn{
+  background:none;border:none;color:var(--ink-3);
+  font-size:20px;width:46px;height:46px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-weight:300;transition:background 0.15s,color 0.15s;
+}
+.qty-btn:hover{background:rgba(0,0,0,0.06);color:var(--ink);}
+.qty-num{flex:1;text-align:center;font-size:20px;font-weight:300;color:var(--ink);}
+.action-btns{display:flex;flex-direction:column;gap:9px;}
+.btn-primary{
+  width:100%;padding:14px;border-radius:10px;border:none;
+  background:var(--ink);color:var(--white);
+  font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.06em;
+  transition:background 0.2s,transform 0.15s;box-shadow:0 3px 12px rgba(0,0,0,0.14);
+}
+.btn-primary:hover{background:var(--ink-2);transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary.added{background:var(--ink-2);}
+.btn-secondary{
+  width:100%;padding:12px;border-radius:10px;
+  border:1px solid rgba(0,0,0,0.11);
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  color:var(--ink-3);font-size:13px;font-weight:500;font-family:inherit;
+  cursor:pointer;letter-spacing:0.03em;transition:background 0.2s,border-color 0.2s;
+}
+.btn-secondary:hover{background:var(--glass-b);border-color:rgba(0,0,0,0.18);}
+.cart-panel-section{display:none;}
+.cart-panel-section.has-items{display:block;}
+.cart-item-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.cart-item-row:last-child{border-bottom:none;}
+.cart-item-emoji{font-size:16px;flex-shrink:0;}
+.cart-item-name{flex:1;font-size:13px;color:var(--ink-2);}
+.cart-item-qty{font-size:11px;font-weight:600;color:var(--ink-2);background:rgba(0,0,0,0.06);padding:2px 8px;border-radius:20px;}
+.cart-item-del{
+  background:none;border:none;color:var(--ink-4);cursor:pointer;font-size:16px;line-height:1;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:background 0.15s,color 0.15s;flex-shrink:0;
+}
+.cart-item-del:hover{background:rgba(0,0,0,0.07);color:var(--ink);}
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:rgba(26,26,26,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:var(--white);padding:10px 24px;border-radius:50px;font-size:13px;font-weight:500;
+  opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;white-space:nowrap;z-index:300;
+  box-shadow:0 6px 24px rgba(0,0,0,0.14);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="./bg.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div class="page">
+  <header>
+    <a class="back-btn" href="./index.php" title="返回首頁">
+      <svg viewBox="0 0 24 24">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+    </a>
+    <div class="header-title">
+      <div class="header-title-main">選購口味</div>
+      <div class="header-title-sub">海陸紅豆餅 · Fresh Daily</div>
+    </div>
+    <button class="cart-fab" id="cart-fab" disabled>
+      🛒 <span id="fab-text">購物車</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </header>
+
+  <div class="body">
+    <div class="flavor-sidebar" id="flavor-sidebar">
+      <div class="sidebar-label">口味選擇</div>
+    </div>
+
+    <div class="showcase-wrap">
+      <canvas id="preview-canvas"></canvas>
+      <div id="loading-hint">
+        <div class="loading-spinner" id="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">請選擇口味</div>
+      </div>
+      <div class="product-name-label" id="product-name-label"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-section">
+        <div class="section-label">商品資訊</div>
+        <div class="product-price">
+          <span id="price-display">—</span>
+          <span class="product-price-unit">元／個</span>
+        </div>
+        <div class="product-desc" id="product-desc">請從左側選擇口味</div>
+      </div>
+      <div class="panel-section">
+        <div class="qty-label">數量</div>
+        <div class="qty-row">
+          <button class="qty-btn" id="btn-minus">−</button>
+          <span class="qty-num" id="qty-display">1</span>
+          <button class="qty-btn" id="btn-plus">+</button>
+        </div>
+      </div>
+      <div class="panel-section action-btns">
+        <button class="btn-primary" id="btn-add">加入購物車</button>
+        <button class="btn-secondary" id="btn-go">查看購物車</button>
+      </div>
+      <div class="panel-section cart-panel-section" id="cart-panel">
+        <div class="section-label">已選商品</div>
+        <div id="cart-rows"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const PRODUCTS = [
+  { id:'p1', name:'大腸麵線', desc:'鮮香Q彈，古早味道',       emoji:'🍜', price:60,  modelUrl:'big1.glb' },
+  { id:'p2', name:'紅豆',     desc:'飽滿蜜紅豆，甜而不膩',     emoji:'🫘', price:45,  modelUrl:'red.glb' },
+  { id:'p3', name:'奶油',     desc:'法式奶油，濃醇滑順',       emoji:'🧈', price:50,  modelUrl:'butter1.glb' },
+  { id:'p4', name:'芒果',     desc:'台灣愛文芒果，香甜多汁',   emoji:'🥭', price:75,  modelUrl:'mango.glb' },
+  { id:'p5', name:'巧克力',   desc:'比利時黑巧克力，層次豐富', emoji:'🍫', price:65,  modelUrl:'chocolate.glb' },
+  { id:'p6', name:'香菜',     desc:'新鮮香菜，清爽獨特',       emoji:'🌿', price:40,  modelUrl:'webcam.glb' },
+  { id:'p7', name:'納豆',     desc:'健康發酵，風味獨特',       emoji:'🫙', price:55,  modelUrl:'nana.glb' },
+  { id:'p8', name:'榴槤',     desc:'貓山王榴槤，王者風味',     emoji:'🍈', price:120, modelUrl:'lolo.glb' },
+];
+
+let cart = {};
+try {
+  const saved = JSON.parse(localStorage.getItem('cartItems') || '[]');
+  saved.forEach(item => { if (item.id && item.qty > 0) cart[item.id] = item.qty; });
+} catch(e) {}
+
+function saveCart() {
+  const items = Object.entries(cart)
+    .filter(([, q]) => q > 0)
+    .map(([id, qty]) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return { id: p.id, name: p.name, price: p.price, qty, emoji: p.emoji, modelUrl: p.modelUrl || '' };
+    });
+  localStorage.setItem('cartItems', JSON.stringify(items));
+}
+
+const canvas       = document.getElementById('preview-canvas');
+const showcaseWrap = document.querySelector('.showcase-wrap');
+const hint         = document.getElementById('loading-hint');
+const spinner      = document.getElementById('loading-spinner');
+const loadTxt      = document.getElementById('loading-text');
+const nameLabel    = document.getElementById('product-name-label');
+const priceEl      = document.getElementById('price-display');
+const descEl       = document.getElementById('product-desc');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace    = THREE.SRGBColorSpace;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.setClearColor(0x000000, 0);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.001, 100);
+camera.position.set(0, 1.2, 3.5);
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.08;
+controls.autoRotate      = true;
+controls.autoRotateSpeed = 1.5;
+controls.enableZoom      = true;
+controls.enablePan       = false;
+controls.mouseButtons    = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: null };
+controls.minDistance     = 0.5;
+controls.maxDistance     = 12;
+
+scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 2.0);
+sun.position.set(4, 6, 5); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xe8e8e8, 0.5);
+fill.position.set(-3, 2, -3); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xd8d8d8, 0.3);
+rim.position.set(0, -2, -4); scene.add(rim);
+
+function resizePreview() {
+  const w = showcaseWrap.clientWidth, h = showcaseWrap.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resizePreview);
+resizePreview();
+
+let currentModel   = null;
+let baseScale      = 1.0;
+let squeezeY       = 1.0;
+let squeezed       = false;
+let mixer          = null;
+let currentActions = [];
+
+function applyScale() {
+  if (!currentModel) return;
+  currentModel.scale.set(baseScale, baseScale * squeezeY, baseScale);
+}
+
+let mouseDownX = 0, mouseDownY = 0;
+canvas.addEventListener('mousedown', e => {
+  mouseDownX = e.clientX; mouseDownY = e.clientY;
+  controls.autoRotate = false;
+});
+window.addEventListener('mouseup', e => {
+  if (e.button === 0) setTimeout(() => { controls.autoRotate = true; }, 1500);
+});
+
+canvas.addEventListener('click', e => {
+  const dist = Math.hypot(e.clientX - mouseDownX, e.clientY - mouseDownY);
+  if (dist > 5 || !currentModel || squeezed) return;
+
+  /* 彈跳動畫 */
+  squeezed = true;
+  const dur1 = 200, dur2 = 350, t0 = performance.now();
+  function squishDown(now) {
+    const p = Math.min((now - t0) / dur1, 1);
+    squeezeY = 1.0 + (0.3 - 1.0) * (1 - Math.pow(1 - p, 2));
+    applyScale();
+    if (p < 1) requestAnimationFrame(squishDown);
+    else {
+      const t1 = performance.now();
+      function bounceBack(n) {
+        const p2 = Math.min((n - t1) / dur2, 1);
+        const e2 = p2 === 1 ? 1 : Math.pow(2,-10*p2)*Math.sin((p2*10-0.75)*(2*Math.PI/3))+1;
+        squeezeY = 0.3 + 0.7 * e2;
+        applyScale();
+        if (p2 < 1) requestAnimationFrame(bounceBack);
+        else { squeezeY = 1.0; applyScale(); squeezed = false; }
+      }
+      requestAnimationFrame(bounceBack);
+    }
+  }
+  requestAnimationFrame(squishDown);
+
+  /* GLB 動畫播放一次 */
+  if (mixer && currentActions.length > 0) {
+    controls.autoRotate = false;
+    currentActions.forEach(a => {
+      a.reset();
+      a.clampWhenFinished = true;
+      a.loop = THREE.LoopOnce;
+      a.play();
+    });
+    const maxDur = Math.max(...currentActions.map(a => a.getClip().duration)) * 1000;
+    setTimeout(() => { controls.autoRotate = true; }, maxDur + 300);
+  }
+});
+
+const loader = new GLTFLoader();
+function loadProductModel(product) {
+  if (mixer) { mixer.stopAllAction(); mixer = null; }
+  currentActions = [];
+
+  if (currentModel) {
+    scene.remove(currentModel);
+    currentModel.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+    currentModel = null;
+  }
+  nameLabel.textContent = product.name;
+  priceEl.textContent   = product.price;
+  descEl.textContent    = product.desc || '';
+  squeezeY = 1; squeezed = false;
+
+  if (!product.modelUrl) {
+    spinner.style.display = 'none';
+    loadTxt.textContent   = '尚無模型';
+    hint.style.display    = 'flex';
+    canvas.style.opacity  = '0';
+    return;
+  }
+  hint.style.display    = 'flex';
+  spinner.style.display = 'block';
+  canvas.style.opacity  = '0';
+  loadTxt.textContent   = '載入中...';
+
+  loader.load(product.modelUrl, (gltf) => {
+    const model = gltf.scene;
+    const box    = new THREE.Box3().setFromObject(model);
+    const size   = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    baseScale = 1.8 / Math.max(size.x, size.y, size.z);
+    model.scale.setScalar(baseScale);
+    model.position.sub(center.multiplyScalar(baseScale));
+    scene.add(model);
+    currentModel = model;
+    controls.target.set(0, 0, 0);
+    controls.update();
+    hint.style.display   = 'none';
+    canvas.style.opacity = '1';
+
+    if (gltf.animations && gltf.animations.length > 0) {
+      mixer = new THREE.AnimationMixer(model);
+      gltf.animations.forEach(clip => {
+        const action = mixer.clipAction(clip);
+        action.paused = true;
+        currentActions.push(action);
+      });
+    }
+  }, (xhr) => {
+    if (xhr.total) loadTxt.textContent = `${Math.round(xhr.loaded/xhr.total*100)}%`;
+  }, (err) => {
+    console.error('❌', err);
+    spinner.style.display = 'none';
+    loadTxt.textContent   = '載入失敗';
+  });
+}
+
+const clock = new THREE.Clock();
+(function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mixer) mixer.update(dt);
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+let selectedId = PRODUCTS[0].id, qty = 1;
+
+function renderCartPanel() {
+  const panel = document.getElementById('cart-panel');
+  const rows  = document.getElementById('cart-rows');
+  const keys  = Object.keys(cart).filter(id => cart[id] > 0);
+  if (!keys.length) { panel.classList.remove('has-items'); return; }
+  panel.classList.add('has-items');
+  rows.innerHTML = keys.map(id => {
+    const p = PRODUCTS.find(x => x.id === id);
+    if (!p) return '';
+    return `<div class="cart-item-row">
+      <span class="cart-item-emoji">${p.emoji}</span>
+      <span class="cart-item-name">${p.name}</span>
+      <span class="cart-item-qty">×${cart[id]}</span>
+      <button class="cart-item-del" data-id="${id}">×</button>
+    </div>`;
+  }).join('');
+  rows.querySelectorAll('.cart-item-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const p  = PRODUCTS.find(x => x.id === id);
+      delete cart[id];
+      saveCart(); updateCartUI();
+      showToast(`已移除 ${p?.name}`);
+    });
+  });
+}
+
+function updateCartUI() {
+  const total = Object.values(cart).reduce((s, v) => s + v, 0);
+  document.getElementById('cart-count').textContent = total;
+  document.getElementById('cart-fab').disabled = total === 0;
+  document.getElementById('fab-text').textContent = total > 0 ? `(${total})` : '購物車';
+  renderCartPanel();
+}
+
+function renderFlavors() {
+  const sidebar = document.getElementById('flavor-sidebar');
+  sidebar.querySelectorAll('.flavor-tag').forEach(el => el.remove());
+  PRODUCTS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'flavor-tag' + (p.id === selectedId ? ' active' : '');
+    btn.innerHTML = `
+      <span class="flavor-tag-emoji">${p.emoji}</span>
+      <span>${p.name}</span>
+      <span class="flavor-tag-price">${p.price}</span>
+    `;
+    btn.addEventListener('click', () => selectProduct(p.id));
+    sidebar.appendChild(btn);
+  });
+}
+
+function selectProduct(id) {
+  selectedId = id; qty = 1;
+  document.getElementById('qty-display').textContent = qty;
+  document.getElementById('btn-add').textContent = '加入購物車';
+  document.getElementById('btn-add').classList.remove('added');
+  loadProductModel(PRODUCTS.find(x => x.id === id));
+  renderFlavors();
+}
+
+document.getElementById('btn-minus').addEventListener('click', () => {
+  if (qty <= 1) return; qty--;
+  document.getElementById('qty-display').textContent = qty;
+});
+document.getElementById('btn-plus').addEventListener('click', () => {
+  qty++;
+  document.getElementById('qty-display').textContent = qty;
+});
+document.getElementById('btn-add').addEventListener('click', () => {
+  const p = PRODUCTS.find(x => x.id === selectedId);
+  cart[selectedId] = (cart[selectedId] || 0) + qty;
+  document.getElementById('btn-add').textContent = '✓ 已加入';
+  document.getElementById('btn-add').classList.add('added');
+  setTimeout(() => {
+    document.getElementById('btn-add').textContent = '加入購物車';
+    document.getElementById('btn-add').classList.remove('added');
+  }, 1200);
+  saveCart(); updateCartUI();
+  showToast(`${p.name} ×${qty} 已加入`);
+});
+document.getElementById('btn-go').addEventListener('click', goToCart);
+document.getElementById('cart-fab').addEventListener('click', goToCart);
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function goToCart() {
+  if (!Object.keys(cart).filter(id => cart[id] > 0).length) {
+    showToast('請先選擇商品！'); return;
+  }
+  saveCart();
+  window.location.href = 'cart.php';
+}
+
+renderFlavors();
+updateCartUI();
+loadProductModel(PRODUCTS[0]);
+</script>
+</body>
+</html>
