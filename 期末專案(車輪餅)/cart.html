@@ -248,7 +248,7 @@ canvas { display:block; width:100%!important; height:100%!important; }
 <div class="overlay"></div>
 
 <header>
-  <a class="back-btn" href="Shop.html" title="繼續選購">
+  <a class="back-btn" href="./Shop.html" title="繼續選購">
     <svg viewBox="0 0 24 24">
       <line x1="19" y1="12" x2="5" y2="12"/>
       <polyline points="12 19 5 12 12 5"/>
@@ -291,11 +291,38 @@ canvas { display:block; width:100%!important; height:100%!important; }
   <span style="color:var(--ink-4);font-size:13px;">購物車是空的</span>
 </div>
 
+<!-- ★ Firebase（需在 Three.js 之前載入） ★ -->
+<script type="module">
+import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp }
+                               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:            "AIzaSyD1WeeJoIxdGz9lOpk9zBGIr4jR50OLREs",
+  authDomain:        "hailua-orders.firebaseapp.com",
+  projectId:         "hailua-orders",
+  storageBucket:     "hailua-orders.firebasestorage.app",
+  messagingSenderId: "747213229698",
+  appId:             "1:747213229698:web:678e8eb1757c2fd30eae9b",
+});
+const db = getFirestore(app);
+
+window._sendOrder = async (customerName, items) => {
+  await addDoc(collection(db, 'orders'), {
+    name:  customerName,
+    items: items.map(i => ({ name:i.name, emoji:i.emoji||'', price:i.price, qty:i.qty })),
+    total: items.reduce((s,i) => s + i.price * i.qty, 0),
+    done:  false,
+    time:  serverTimestamp(),
+  });
+};
+</script>
+
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    "three":          "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/":  "https://unpkg.com/three@0.160.0/examples/jsm/"
   }
 }
 </script>
@@ -546,7 +573,7 @@ new GLTFLoader().load(CART_MODEL_URL, (gltf) => {
 /* ── 結帳 ── */
 const successMsg = document.getElementById('success-msg');
 
-function doCheckout(customerName) {
+async function doCheckout(customerName) {
   animRunning = true;
   btnCheckout.disabled = true;
 
@@ -558,12 +585,9 @@ function doCheckout(customerName) {
     setTimeout(showSuccess, 800);
   }
 
-  /* ★ 送訂單到後端，fire-and-forget ★ */
-  fetch('order.html', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items: cartItems, customerName }),
-  }).catch(() => {});
+  /* ★ 送訂單到 Firebase，fire-and-forget ★ */
+  try { await window._sendOrder(customerName, cartItems); }
+  catch(e) { console.warn('Firebase 寫入失敗', e); }
 }
 
 function showSuccess() {
