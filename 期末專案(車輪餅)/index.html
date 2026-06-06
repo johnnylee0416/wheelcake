@@ -3,27 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- ★ SEO ★ -->
-<title>海陸紅豆餅 — 八種口味，每日現烤</title>
-<meta name="description"    content="海陸紅豆餅提供紅豆、奶油、芒果、巧克力、大腸麵線、香菜、納豆、榴槤八種口味，精選台灣在地食材，每日現烤現賣，傳遞二十年古早滋味。">
-<meta name="keywords"       content="海陸紅豆餅,紅豆餅,車輪餅,台灣小吃,現烤紅豆餅,古早味">
-<meta name="author"         content="海陸紅豆餅">
-<meta name="robots"         content="index, follow">
-
-<!-- Open Graph（分享到 FB / LINE 時顯示） -->
-<meta property="og:type"        content="website">
-<meta property="og:title"       content="海陸紅豆餅 — 八種口味，每日現烤">
-<meta property="og:description" content="精選台灣在地食材，每日現烤現賣。紅豆、奶油、芒果、巧克力等八種口味任您選。">
-<meta property="og:image"       content="./o1.png">
-<meta property="og:locale"      content="zh_TW">
-
-<!-- Twitter Card -->
-<meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="海陸紅豆餅 — 八種口味，每日現烤">
-<meta name="twitter:description" content="精選台灣在地食材，每日現烤現賣。">
-<meta name="twitter:image"       content="./o1.png">
-
+<title>海陸紅豆餅</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -107,7 +87,7 @@ html, body {
   animation: fadeUp 0.8s 0.25s ease forwards;
 }
 
-.hero-display h1 {
+.hero-display h1 {       
   font-family: 'Playfair Display', serif;
   font-size: clamp(52px, 7.5vw, 88px);
   font-weight: 900;
@@ -221,6 +201,7 @@ html, body {
   animation: fadeIn 1s 0.5s ease forwards;
 }
 
+/* 裝飾數字 */
 .deco-num {
   position: absolute;
   bottom: 52px;
@@ -236,6 +217,7 @@ html, body {
   z-index: 3;
 }
 
+/* ── 圖片：填滿整個 right-visual ── */
 .visual-img-wrap {
   position: absolute;
   inset: 0;
@@ -250,6 +232,7 @@ html, body {
   transition: opacity 0.8s ease;
 }
 
+/* 佔位框（src 為空時顯示）*/
 .visual-img-placeholder {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
@@ -271,6 +254,7 @@ html, body {
   color: rgba(0,0,0,0.22);
 }
 
+/* 名稱＋價格：疊在圖片底部 */
 .visual-center {
   position: absolute;
   inset: 0;
@@ -279,6 +263,7 @@ html, body {
   align-items: flex-start;
   justify-content: flex-end;
   padding: 0 28px 52px;
+  /* 下方漸層遮罩，讓文字可讀 */
   background: linear-gradient(to top,
     rgba(26,26,26,0.55) 0%,
     rgba(26,26,26,0.15) 40%,
@@ -305,6 +290,7 @@ html, body {
   margin-top: 6px;
 }
 
+/* 輪播點：右下角 */
 .item-dots {
   position: absolute;
   bottom: 24px;
@@ -327,6 +313,7 @@ html, body {
   transform: scale(1.5);
 }
 
+/* ── 底部資訊欄 ── */
 .right-info {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -371,6 +358,7 @@ html, body {
   margin-top: 4px;
 }
 
+/* ── Animations ── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -380,6 +368,7 @@ html, body {
   to   { opacity: 1; }
 }
 
+/* ── Scroll line ── */
 .scroll-line {
   position: fixed;
   left: 50%;
@@ -392,6 +381,7 @@ html, body {
   animation: fadeIn 1s 1s ease forwards;
 }
 
+/* ── Nav dots ── */
 .nav-dots {
   position: fixed;
   left: 24px;
@@ -441,7 +431,9 @@ html, body {
     </div>
 
     <div class="hero-display">
-      <h1>海陸紅豆餅</h1>
+      <h1>
+        海陸紅豆餅
+      </h1>
       <p class="hero-sub">
         精選台灣在地食材，每日現烤現賣。<br>
         八種口味，傳遞二十年的古早滋味。
@@ -450,9 +442,9 @@ html, body {
 
     <div class="bottom-row">
       <div class="flavor-tags">
-        <div class="tag-item">紅豆 · 奶油 · 芒果</div>
-        <div class="tag-item">巧克力 · 大腸麵線</div>
-        <div class="tag-item">香菜 · 納豆 · 榴槤</div>
+        <div class="tag-item"></span>紅豆 · 奶油 · 芒果</div>
+        <div class="tag-item"></span>巧克力 · 大腸麵線</div>
+        <div class="tag-item"></span>香菜 · 納豆 · 榴槤</div>
       </div>
 
       <a class="cta-arrow" href="Shop.html">
@@ -466,14 +458,16 @@ html, body {
       </a>
     </div>
 
-  </div>
+  </div><!-- /left -->
 
   <!-- ══ RIGHT ══ -->
   <div class="right">
 
     <div class="right-visual">
+
+      <!-- 全滿圖片層 -->
       <div class="visual-img-wrap" id="visual-img-wrap">
-        <img id="visual-img" src="o1.png" alt="紅豆餅">
+        <img id="visual-img" src="o1.png" alt="紅豆">
         <div class="visual-img-placeholder" id="visual-placeholder" style="display:none;">
           <svg class="placeholder-icon" viewBox="0 0 24 24">
             <rect x="3" y="3" width="18" height="18" rx="3"/>
@@ -484,41 +478,15 @@ html, body {
         </div>
       </div>
 
+      <!-- 裝飾數字 -->
       <div class="deco-num" id="deco-num">01</div>
+
+      <!-- 輪播點 -->
       <div class="item-dots" id="item-dots"></div>
+
     </div>
 
-  </div>
 
-</div>
-
-<!-- JSON-LD 結構化資料，幫助 Google 理解網站內容 -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FoodEstablishment",
-  "name": "海陸紅豆餅",
-  "description": "精選台灣在地食材，每日現烤現賣，提供紅豆、奶油、芒果、巧克力、大腸麵線、香菜、納豆、榴槤八種口味。",
-  "servesCuisine": "台灣小吃",
-  "hasMenu": {
-    "@type": "Menu",
-    "hasMenuSection": {
-      "@type": "MenuSection",
-      "name": "口味",
-      "hasMenuItem": [
-        { "@type": "MenuItem", "name": "紅豆",     "offers": { "@type": "Offer", "price": "45", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "奶油",     "offers": { "@type": "Offer", "price": "50", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "芒果",     "offers": { "@type": "Offer", "price": "75", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "巧克力",   "offers": { "@type": "Offer", "price": "65", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "大腸麵線", "offers": { "@type": "Offer", "price": "60", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "香菜",     "offers": { "@type": "Offer", "price": "40", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "納豆",     "offers": { "@type": "Offer", "price": "55", "priceCurrency": "TWD" } },
-        { "@type": "MenuItem", "name": "榴槤",     "offers": { "@type": "Offer", "price": "120","priceCurrency": "TWD" } }
-      ]
-    }
-  }
-}
-</script>
 
 <script>
 const ITEMS = [
@@ -538,6 +506,7 @@ const placeholder = document.getElementById('visual-placeholder');
 const decoEl      = document.getElementById('deco-num');
 const dotsEl      = document.getElementById('item-dots');
 
+/* 建立輪播點 */
 ITEMS.forEach((_, i) => {
   const d = document.createElement('div');
   d.className = 'item-dot' + (i === 0 ? ' active' : '');
@@ -548,19 +517,23 @@ ITEMS.forEach((_, i) => {
 function goTo(idx) {
   current = idx;
   const item = ITEMS[idx];
-  imgEl.style.opacity = '0';
+
+  /* 淡出 */
+  imgEl.style.opacity  = '0';
+
   setTimeout(() => {
     if (item.img) {
       imgEl.src = item.img;
-      imgEl.alt = item.name + '紅豆餅';
-      imgEl.style.opacity = '1';
+      imgEl.alt = item.name;
+      imgEl.style.opacity  = '1';
       placeholder.style.display = 'none';
     } else {
       imgEl.src = '';
-      imgEl.style.opacity = '0';
+      imgEl.style.opacity  = '0';
       placeholder.style.display = 'flex';
     }
-    decoEl.textContent = String(idx + 1).padStart(2, '0');
+
+    decoEl.textContent  = String(idx + 1).padStart(2, '0');
   }, 500);
 
   dotsEl.querySelectorAll('.item-dot').forEach((d, i) =>
