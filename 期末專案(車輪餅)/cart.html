@@ -559,7 +559,7 @@ function doCheckout(customerName) {
   }
 
   /* ★ 送訂單到後端，fire-and-forget ★ */
-  fetch('./order.php', {
+  fetch('order.html', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ items: cartItems, customerName }),
