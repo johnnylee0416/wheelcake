@@ -31,7 +31,6 @@ body {
   grid-template-rows:auto 1fr auto;
 }
 
-/* ── Background ── */
 #bg-video {
   position:fixed; inset:0;
   width:100%; height:100%;
@@ -48,7 +47,6 @@ body {
   pointer-events:none;
 }
 
-/* ── Header ── */
 header {
   position:relative; z-index:10;
   padding:18px 44px;
@@ -116,7 +114,6 @@ header {
   color:var(--white); box-shadow:0 5px 20px rgba(0,0,0,0.22);
 }
 
-/* ── Success toast ── */
 #success-msg {
   position:fixed; top:76px; left:50%;
   transform:translateX(-50%) translateY(-8px);
@@ -131,7 +128,6 @@ header {
 }
 #success-msg.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ── Canvas ── */
 .canvas-wrap {
   position:relative; z-index:2; overflow:hidden;
 }
@@ -144,7 +140,6 @@ canvas { display:block; width:100%!important; height:100%!important; }
   pointer-events:none; z-index:3;
 }
 
-/* ── Bottom bar ── */
 .bottom-bar {
   position:relative; z-index:10;
   border-top:1px solid var(--border);
@@ -193,6 +188,56 @@ canvas { display:block; width:100%!important; height:100%!important; }
   font-size:24px; font-weight:700; color:var(--ink);
   white-space:nowrap;
 }
+
+/* ══ 姓名 Modal ══ */
+.modal-backdrop {
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.25s;
+}
+.modal-backdrop.open { opacity:1; pointer-events:all; }
+.modal-card {
+  background:var(--white); border-radius:20px;
+  padding:36px 34px; width:320px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.16);
+  transform:translateY(12px) scale(0.97);
+  transition:transform 0.25s;
+}
+.modal-backdrop.open .modal-card { transform:translateY(0) scale(1); }
+.modal-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; margin-bottom:5px; }
+.modal-sub { font-size:12px; color:var(--ink-4); margin-bottom:24px; }
+.modal-label { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-4); display:block; margin-bottom:7px; }
+.modal-input {
+  width:100%; padding:12px 14px; border-radius:10px;
+  border:1.5px solid rgba(0,0,0,0.11); background:var(--surface);
+  font-family:inherit; font-size:15px; color:var(--ink);
+  transition:border-color 0.2s; outline:none;
+}
+.modal-input:focus { border-color:var(--ink-3); }
+.modal-input.shake { animation:shake 0.35s ease; border-color:#c00; }
+@keyframes shake {
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(-6px); }
+  75%{ transform:translateX(6px); }
+}
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.modal-cancel {
+  flex:1; padding:12px; border-radius:10px;
+  border:1px solid rgba(0,0,0,0.11); background:transparent;
+  font-family:inherit; font-size:13px; color:var(--ink-3); cursor:pointer;
+  transition:background 0.15s;
+}
+.modal-cancel:hover { background:var(--surface); }
+.modal-confirm {
+  flex:2; padding:12px; border-radius:10px; border:none;
+  background:var(--ink); color:var(--white);
+  font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+  box-shadow:0 3px 12px rgba(0,0,0,0.14);
+  transition:background 0.15s, transform 0.15s;
+}
+.modal-confirm:hover { background:var(--ink-2); transform:translateY(-1px); }
 </style>
 </head>
 <body>
@@ -223,6 +268,20 @@ canvas { display:block; width:100%!important; height:100%!important; }
 </header>
 
 <div id="success-msg">✓ 結帳成功，感謝您的購買！</div>
+
+<!-- 姓名 Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-card">
+    <div class="modal-title">請輸入姓名</div>
+    <div class="modal-sub">用於訂單紀錄，方便取餐核對</div>
+    <label class="modal-label" for="name-input">姓名</label>
+    <input class="modal-input" id="name-input" type="text" placeholder="例：王小明" maxlength="30" autocomplete="name">
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modal-cancel">取消</button>
+      <button class="modal-confirm" id="modal-confirm">送出訂單</button>
+    </div>
+  </div>
+</div>
 
 <div class="canvas-wrap" id="canvas-wrap">
   <canvas id="c"></canvas>
@@ -290,6 +349,34 @@ function renderItemBar() {
 }
 renderItemBar();
 
+/* ── Modal ── */
+const modal       = document.getElementById('modal');
+const nameInput   = document.getElementById('name-input');
+const btnCheckout = document.getElementById('btn-checkout');
+
+btnCheckout.addEventListener('click', () => {
+  if (animRunning) return;
+  nameInput.value = '';
+  modal.classList.add('open');
+  setTimeout(() => nameInput.focus(), 260);
+});
+
+document.getElementById('modal-cancel').addEventListener('click', () => modal.classList.remove('open'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('modal-confirm').click(); });
+
+document.getElementById('modal-confirm').addEventListener('click', () => {
+  const name = nameInput.value.trim();
+  if (!name) {
+    nameInput.classList.add('shake');
+    nameInput.addEventListener('animationend', () => nameInput.classList.remove('shake'), { once: true });
+    nameInput.focus();
+    return;
+  }
+  modal.classList.remove('open');
+  doCheckout(name);
+});
+
 /* ── Three.js ── */
 const canvas = document.getElementById('c');
 const wrap   = document.getElementById('canvas-wrap');
@@ -315,7 +402,6 @@ const camera = new THREE.PerspectiveCamera(38, 1, 0.001, 1000);
 camera.position.set(0, 4.5, -4.5);
 camera.lookAt(0, 0.8, 0);
 
-/* 視角完全鎖定 */
 const controls = new OrbitControls(camera, canvas);
 controls.enableRotate  = false;
 controls.enableZoom    = false;
@@ -324,7 +410,6 @@ controls.enableDamping = false;
 controls.target.set(0, 0.8, 0);
 controls.update();
 
-/* 燈光 */
 scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 const sun = new THREE.DirectionalLight(0xffffff, 2.0);
 sun.position.set(5, 10, 7);
@@ -339,7 +424,6 @@ fillL.position.set(-4, 3, -3); scene.add(fillL);
 const rimL = new THREE.DirectionalLight(0xd8d8d8, 0.3);
 rimL.position.set(0, -2, 4); scene.add(rimL);
 
-/* 地面 */
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(40, 40),
   new THREE.MeshStandardMaterial({ color:0xeeecea, roughness:0.95 })
@@ -460,13 +544,12 @@ new GLTFLoader().load(CART_MODEL_URL, (gltf) => {
 }, null, err => console.error('❌', err));
 
 /* ── 結帳 ── */
-const btnCheckout = document.getElementById('btn-checkout');
-const successMsg  = document.getElementById('success-msg');
+const successMsg = document.getElementById('success-msg');
 
-btnCheckout.addEventListener('click', () => {
-  if (animRunning) return;
+function doCheckout(customerName) {
   animRunning = true;
   btnCheckout.disabled = true;
+
   if (actions.length > 0) {
     actions.forEach(a => { a.reset(); a.paused=false; a.play(); });
     const dur = Math.max(...actions.map(a => a.getClip().duration)) * 1000;
@@ -474,7 +557,14 @@ btnCheckout.addEventListener('click', () => {
   } else {
     setTimeout(showSuccess, 800);
   }
-});
+
+  /* ★ 送訂單到後端，fire-and-forget ★ */
+  fetch('./order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: cartItems, customerName }),
+  }).catch(() => {});
+}
 
 function showSuccess() {
   animRunning = false;
