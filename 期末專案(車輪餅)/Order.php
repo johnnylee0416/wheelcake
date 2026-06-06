@@ -1,0 +1,288 @@
+<?php
+/**
+ * 海陸紅豆餅 — 訂單後端（單一檔案）
+ * POST application/json  → 接收前端訂單
+ * GET  ?pw=密碼           → 後台頁面
+ * POST form              → 勾選完成 / 刪除已完成
+ */
+
+define('ADMIN_PASS',  'hailuadmin');
+define('ORDERS_FILE', __DIR__ . '/orders.json');
+
+function load_orders() {
+    if (!file_exists(ORDERS_FILE)) return [];
+    return json_decode(file_get_contents(ORDERS_FILE), true) ?: [];
+}
+function save_orders($orders) {
+    file_put_contents(ORDERS_FILE, json_encode(array_values($orders), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+}
+
+/* ══ CORS preflight ══ */
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    http_response_code(204); exit;
+}
+
+/* ══ POST ══ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ct = $_SERVER['CONTENT_TYPE'] ?? '';
+
+    /* ── JSON：前端送來的訂單 ── */
+    if (strpos($ct, 'application/json') !== false) {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Origin: *');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (empty($data['items'])) { http_response_code(400); exit; }
+
+        $total = 0; $items = [];
+        foreach ($data['items'] as $item) {
+            $price = intval($item['price'] ?? 0);
+            $qty   = intval($item['qty']   ?? 0);
+            if (!$price || !$qty) continue;
+            $total  += $price * $qty;
+            $items[] = [
+                'name'  => htmlspecialchars(trim($item['name']  ?? ''), ENT_QUOTES, 'UTF-8'),
+                'emoji' => $item['emoji'] ?? '',
+                'price' => $price,
+                'qty'   => $qty,
+            ];
+        }
+
+        $orders   = load_orders();
+        $orders[] = [
+            'time'  => date('Y-m-d H:i:s'),
+            'name'  => htmlspecialchars(trim($data['customerName'] ?? '匿名'), ENT_QUOTES, 'UTF-8'),
+            'items' => $items,
+            'total' => $total,
+            'done'  => false,
+        ];
+        save_orders($orders);
+        echo json_encode(['success' => true]); exit;
+    }
+
+    /* ── Form：後台操作 ── */
+    $pw = trim($_POST['pw'] ?? '');
+    if ($pw !== ADMIN_PASS) { header('Location: order.php'); exit; }
+
+    $orders = load_orders();
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'toggle') {
+        /* idx 是後台顯示順序（reverse）的位置，換算回原始陣列位置 */
+        $dispIdx = intval($_POST['idx'] ?? -1);
+        $realIdx = count($orders) - 1 - $dispIdx;
+        if (array_key_exists($realIdx, $orders)) {
+            $orders[$realIdx]['done'] = !($orders[$realIdx]['done'] ?? false);
+        }
+    } elseif ($action === 'delete') {
+        $orders = array_values(array_filter($orders, fn($o) => !($o['done'] ?? false)));
+    }
+
+    save_orders($orders);
+    header('Location: order.php?pw=' . urlencode($pw)); exit;
+}
+
+/* ══ GET：後台頁面 ══ */
+$pw     = trim($_GET['pw'] ?? '');
+$authed = ($pw === ADMIN_PASS);
+
+$orders = [];
+if ($authed) {
+    $orders = array_reverse(load_orders()); // 最新在前，index 0 = 最新
+}
+
+$totalRevenue  = array_sum(array_column($orders, 'total'));
+$totalOrders   = count($orders);
+$pendingOrders = count(array_filter($orders, fn($o) => !($o['done'] ?? false)));
+$hasDone       = count(array_filter($orders, fn($o) =>  ($o['done'] ?? false))) > 0;
+?>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訂單後台 — 海陸紅豆餅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{ --ink:#1a1a1a; --ink-3:#6b6b6b; --ink-4:#a0a0a0; --bg:#f5f4f1; --white:#fff; --border:rgba(0,0,0,0.09); }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Noto Sans TC',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; }
+
+/* Login */
+.login{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.card{ background:var(--white); border-radius:16px; padding:44px 38px; width:300px; box-shadow:0 6px 30px rgba(0,0,0,0.08); }
+.logo{ font-family:'Playfair Display',serif; font-size:20px; font-weight:700; text-align:center; margin-bottom:4px; }
+.sub{ font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-4); text-align:center; margin-bottom:28px; }
+.card label{ font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ink-4); display:block; margin-bottom:6px; }
+.card input{ width:100%; padding:11px 13px; border-radius:9px; border:1px solid rgba(0,0,0,0.12); background:var(--bg); font-family:inherit; font-size:14px; margin-bottom:14px; }
+.card input:focus{ outline:none; border-color:var(--ink-3); }
+.btn-login{ width:100%; padding:12px; border-radius:9px; border:none; background:var(--ink); color:#fff; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.btn-login:hover{ background:#3a3a3a; }
+.err{ color:#c00; font-size:13px; margin-top:10px; text-align:center; }
+
+/* Header */
+.hd{ background:var(--white); border-bottom:1px solid var(--border); padding:14px 36px; display:flex; align-items:center; gap:14px; position:sticky; top:0; z-index:20; }
+.hd-title{ font-family:'Playfair Display',serif; font-size:17px; font-weight:700; flex:1; }
+.hd-title span{ font-size:11px; font-weight:400; color:var(--ink-4); margin-left:8px; letter-spacing:0.14em; text-transform:uppercase; font-family:'Noto Sans TC',sans-serif; }
+.hd a{ font-size:12px; color:var(--ink-4); text-decoration:none; padding:6px 14px; border-radius:50px; border:1px solid rgba(0,0,0,0.12); transition:background .15s; }
+.hd a:hover{ background:var(--bg); }
+
+/* Main */
+.main{ max-width:980px; margin:0 auto; padding:28px 20px; }
+
+/* Stats */
+.stats{ display:flex; gap:14px; margin-bottom:28px; flex-wrap:wrap; }
+.stat{ background:var(--white); border-radius:12px; padding:20px 24px; flex:1; min-width:130px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+.stat-l{ font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ink-4); margin-bottom:8px; }
+.stat-n{ font-family:'Playfair Display',serif; font-size:30px; font-weight:700; line-height:1; }
+.stat-u{ font-size:12px; color:var(--ink-4); margin-top:2px; }
+
+/* Toolbar */
+.toolbar{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.sec{ font-family:'Playfair Display',serif; font-size:18px; font-weight:700; flex:1; }
+.btn-del{ padding:9px 20px; border-radius:50px; border:1px solid rgba(200,0,0,0.25); background:rgba(255,240,240,0.8); color:#c00; font-family:inherit; font-size:13px; font-weight:500; cursor:pointer; transition:background .15s; }
+.btn-del:hover:not(:disabled){ background:rgba(255,220,220,0.9); border-color:rgba(200,0,0,0.4); }
+.btn-del:disabled{ opacity:0.35; cursor:not-allowed; }
+
+/* Table */
+.tbl-w{ background:var(--white); border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.04); overflow:auto; }
+table{ width:100%; border-collapse:collapse; min-width:540px; }
+thead th{ padding:11px 16px; text-align:left; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ink-4); border-bottom:1px solid var(--border); background:rgba(245,244,241,0.6); white-space:nowrap; }
+thead th:first-child{ width:48px; text-align:center; }
+tbody tr{ border-bottom:1px solid var(--border); transition:opacity .2s; }
+tbody tr:last-child{ border-bottom:none; }
+tbody tr:hover{ background:rgba(245,244,241,0.5); }
+tbody tr.done-row{ opacity:0.4; }
+tbody tr.done-row .cname{ text-decoration:line-through; color:var(--ink-4); }
+tbody td{ padding:12px 16px; font-size:13px; vertical-align:middle; }
+tbody td:first-child{ text-align:center; }
+
+/* Checkbox button */
+.cb-btn{
+    width:22px; height:22px; border-radius:6px;
+    border:1.5px solid rgba(0,0,0,0.18);
+    background:var(--white); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    transition:background .15s, border-color .15s;
+    padding:0; flex-shrink:0;
+}
+.cb-btn:hover{ border-color:var(--ink-3); }
+.cb-btn.checked{ background:var(--ink); border-color:var(--ink); }
+.cb-btn.checked::after{ content:''; display:block; width:5px; height:9px; border:2px solid #fff; border-top:none; border-left:none; transform:rotate(45deg) translate(-1px,-1px); }
+
+.ts{ font-size:12px; color:var(--ink-4); white-space:nowrap; }
+.cname{ font-weight:600; }
+.chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.chip{ display:inline-flex; align-items:center; gap:3px; background:var(--bg); border:1px solid var(--border); border-radius:50px; padding:2px 9px 2px 6px; font-size:12px; white-space:nowrap; }
+.cq{ background:var(--ink); color:#fff; border-radius:50px; font-size:10px; font-weight:700; min-width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; padding:0 3px; }
+.tot{ font-family:'Playfair Display',serif; font-size:15px; font-weight:700; white-space:nowrap; }
+.empty{ text-align:center; padding:52px; color:var(--ink-4); }
+</style>
+</head>
+<body>
+
+<?php if (!$authed): ?>
+<div class="login">
+  <div class="card">
+    <div class="logo">海陸紅豆餅</div>
+    <div class="sub">訂單後台</div>
+    <form method="GET">
+      <label>密碼</label>
+      <input type="password" name="pw" placeholder="••••••••" autofocus required>
+      <button class="btn-login" type="submit">登入</button>
+      <?php if (isset($_GET['pw'])): ?>
+        <div class="err">密碼錯誤</div>
+      <?php endif; ?>
+    </form>
+  </div>
+</div>
+
+<?php else: ?>
+<div class="hd">
+  <div class="hd-title">海陸紅豆餅 <span>Order Dashboard</span></div>
+  <a href="order.php">登出</a>
+</div>
+
+<div class="main">
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-l">待處理</div>
+      <div class="stat-n"><?= $pendingOrders ?></div>
+      <div class="stat-u">筆</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">總訂單數</div>
+      <div class="stat-n"><?= $totalOrders ?></div>
+      <div class="stat-u">筆</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">累計營收</div>
+      <div class="stat-n">NT$<?= number_format($totalRevenue) ?></div>
+      <div class="stat-u">新台幣</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="sec">訂單紀錄</div>
+    <form method="POST" onsubmit="return confirm('確定刪除所有已完成的訂單？')">
+      <input type="hidden" name="pw"     value="<?= htmlspecialchars($pw) ?>">
+      <input type="hidden" name="action" value="delete">
+      <button class="btn-del" type="submit" <?= $hasDone ? '' : 'disabled' ?>>刪除已完成</button>
+    </form>
+  </div>
+
+  <div class="tbl-w">
+    <?php if (empty($orders)): ?>
+      <div class="empty">🧾 尚無訂單紀錄</div>
+    <?php else: ?>
+    <table>
+      <thead>
+        <tr>
+          <th>完成</th>
+          <th>時間</th>
+          <th>姓名</th>
+          <th>商品</th>
+          <th>合計</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($orders as $dispIdx => $o):
+          $done = !empty($o['done']);
+        ?>
+        <tr class="<?= $done ? 'done-row' : '' ?>">
+          <td>
+            <form method="POST" style="display:inline">
+              <input type="hidden" name="pw"     value="<?= htmlspecialchars($pw) ?>">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="idx"    value="<?= $dispIdx ?>">
+              <button type="submit" class="cb-btn <?= $done ? 'checked' : '' ?>"></button>
+            </form>
+          </td>
+          <td><span class="ts"><?= htmlspecialchars($o['time']) ?></span></td>
+          <td><span class="cname"><?= htmlspecialchars($o['name']) ?></span></td>
+          <td>
+            <div class="chips">
+              <?php foreach ($o['items'] as $it): ?>
+              <span class="chip">
+                <?= htmlspecialchars($it['emoji']) ?>
+                <?= htmlspecialchars($it['name']) ?>
+                <span class="cq">×<?= intval($it['qty']) ?></span>
+              </span>
+              <?php endforeach; ?>
+            </div>
+          </td>
+          <td><span class="tot">NT$<?= number_format($o['total']) ?></span></td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php endif; ?>
+  </div>
+</div>
+<?php endif; ?>
+</body>
+</html>
