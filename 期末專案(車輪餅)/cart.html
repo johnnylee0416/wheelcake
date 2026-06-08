@@ -499,7 +499,7 @@ function doCheckout(customerName) {
   } else {
     setTimeout(showSuccess, 800);
   }
-  fetch('./order.php', {
+  fetch('./order.html', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ items: cartItems, customerName }),
