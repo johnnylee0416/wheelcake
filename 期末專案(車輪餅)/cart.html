@@ -20,7 +20,6 @@
   --blur:    blur(16px);
 }
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-
 body {
   font-family:'Noto Sans TC',sans-serif;
   background:var(--surface);
@@ -30,7 +29,6 @@ body {
   display:grid;
   grid-template-rows:auto 1fr auto;
 }
-
 #bg-video {
   position:fixed; inset:0;
   width:100%; height:100%;
@@ -46,7 +44,6 @@ body {
     linear-gradient(160deg, rgba(245,244,241,0.10) 0%, rgba(245,244,241,0.55) 100%);
   pointer-events:none;
 }
-
 header {
   position:relative; z-index:10;
   padding:18px 44px;
@@ -56,7 +53,6 @@ header {
   backdrop-filter:var(--blur);
   -webkit-backdrop-filter:var(--blur);
 }
-
 .back-btn {
   display:flex; align-items:center; justify-content:center;
   width:36px; height:36px;
@@ -69,29 +65,12 @@ header {
 }
 .back-btn:hover { background:rgba(255,255,255,0.9); transform:translateX(-2px); }
 .back-btn svg { width:15px; height:15px; stroke:var(--ink); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-
 .header-title { flex:1; display:flex; flex-direction:column; gap:2px; }
-.header-title-main {
-  font-family:'Playfair Display',serif;
-  font-size:17px; font-weight:700; color:var(--ink);
-}
-.header-title-sub {
-  font-size:10px; letter-spacing:0.2em;
-  text-transform:uppercase; color:var(--ink-4);
-}
-
-.header-meta {
-  display:flex; align-items:baseline; gap:5px;
-  margin-right:4px;
-}
-.header-meta-count {
-  font-family:'Playfair Display',serif;
-  font-size:22px; font-weight:700; color:var(--ink);
-}
-.header-meta-label {
-  font-size:12px; color:var(--ink-4);
-}
-
+.header-title-main { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--ink); }
+.header-title-sub { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink-4); }
+.header-meta { display:flex; align-items:baseline; gap:5px; margin-right:4px; }
+.header-meta-count { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--ink); }
+.header-meta-label { font-size:12px; color:var(--ink-4); }
 .hbtn {
   padding:9px 22px; border-radius:50px;
   border:1px solid var(--border2);
@@ -113,7 +92,6 @@ header {
   background:var(--ink-2); border-color:var(--ink-2);
   color:var(--white); box-shadow:0 5px 20px rgba(0,0,0,0.22);
 }
-
 #success-msg {
   position:fixed; top:76px; left:50%;
   transform:translateX(-50%) translateY(-8px);
@@ -127,19 +105,14 @@ header {
   box-shadow:0 4px 20px rgba(0,0,0,0.08);
 }
 #success-msg.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-.canvas-wrap {
-  position:relative; z-index:2; overflow:hidden;
-}
+.canvas-wrap { position:relative; z-index:2; overflow:hidden; }
 canvas { display:block; width:100%!important; height:100%!important; }
-
 .canvas-wrap::after {
   content:'';
   position:absolute; bottom:0; left:0; right:0; height:60px;
   background:linear-gradient(to top, rgba(245,244,241,0.20), transparent);
   pointer-events:none; z-index:3;
 }
-
 .bottom-bar {
   position:relative; z-index:10;
   border-top:1px solid var(--border);
@@ -150,7 +123,6 @@ canvas { display:block; width:100%!important; height:100%!important; }
   backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
 }
 .bottom-bar::-webkit-scrollbar { height:0; }
-
 .item-chip {
   flex-shrink:0;
   display:flex; align-items:center; gap:7px;
@@ -169,27 +141,15 @@ canvas { display:block; width:100%!important; height:100%!important; }
   min-width:18px; height:18px; border-radius:50px;
   display:flex; align-items:center; justify-content:center; padding:0 4px;
 }
-
 .bar-spacer { flex:1; }
-
 .bar-total {
   flex-shrink:0;
   display:flex; align-items:baseline; gap:5px;
   padding-left:20px;
   border-left:1px solid var(--border2);
 }
-.bar-total-label {
-  font-size:10px; font-weight:400;
-  font-family:'Noto Sans TC',sans-serif;
-  color:var(--ink-4); letter-spacing:0.1em;
-}
-.bar-total-num {
-  font-family:'Playfair Display',serif;
-  font-size:24px; font-weight:700; color:var(--ink);
-  white-space:nowrap;
-}
-
-/* ══ 姓名 Modal ══ */
+.bar-total-label { font-size:10px; font-weight:400; font-family:'Noto Sans TC',sans-serif; color:var(--ink-4); letter-spacing:0.1em; }
+.bar-total-num { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--ink); white-space:nowrap; }
 .modal-backdrop {
   position:fixed; inset:0; z-index:100;
   background:rgba(0,0,0,0.35);
@@ -217,11 +177,7 @@ canvas { display:block; width:100%!important; height:100%!important; }
 }
 .modal-input:focus { border-color:var(--ink-3); }
 .modal-input.shake { animation:shake 0.35s ease; border-color:#c00; }
-@keyframes shake {
-  0%,100%{ transform:translateX(0); }
-  25%{ transform:translateX(-6px); }
-  75%{ transform:translateX(6px); }
-}
+@keyframes shake { 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
 .modal-btns { display:flex; gap:10px; margin-top:20px; }
 .modal-cancel {
   flex:1; padding:12px; border-radius:10px;
@@ -254,14 +210,11 @@ canvas { display:block; width:100%!important; height:100%!important; }
       <polyline points="12 19 5 12 12 5"/>
     </svg>
   </a>
-
   <div class="header-title">
     <div class="header-title-main">購物車</div>
     <div class="header-title-sub">海陸紅豆餅 · 確認訂單</div>
   </div>
-
   <div class="header-meta" id="header-meta"></div>
-
   <div style="display:flex;gap:10px;">
     <button class="hbtn hbtn-primary" id="btn-checkout">確認結帳</button>
   </div>
@@ -269,7 +222,6 @@ canvas { display:block; width:100%!important; height:100%!important; }
 
 <div id="success-msg">✓ 結帳成功，感謝您的購買！</div>
 
-<!-- 姓名 Modal -->
 <div class="modal-backdrop" id="modal">
   <div class="modal-card">
     <div class="modal-title">請輸入姓名</div>
@@ -291,38 +243,11 @@ canvas { display:block; width:100%!important; height:100%!important; }
   <span style="color:var(--ink-4);font-size:13px;">購物車是空的</span>
 </div>
 
-<!-- ★ Firebase（需在 Three.js 之前載入） ★ -->
-<script type="module">
-import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
-                               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const app = initializeApp({
-  apiKey:            "AIzaSyD1WeeJoIxdGz9lOpk9zBGIr4jR50OLREs",
-  authDomain:        "hailua-orders.firebaseapp.com",
-  projectId:         "hailua-orders",
-  storageBucket:     "hailua-orders.firebasestorage.app",
-  messagingSenderId: "747213229698",
-  appId:             "1:747213229698:web:678e8eb1757c2fd30eae9b",
-});
-const db = getFirestore(app);
-
-window._sendOrder = async (customerName, items) => {
-  await addDoc(collection(db, 'orders'), {
-    name:  customerName,
-    items: items.map(i => ({ name:i.name, emoji:i.emoji||'', price:i.price, qty:i.qty })),
-    total: items.reduce((s,i) => s + i.price * i.qty, 0),
-    done:  false,
-    time:  serverTimestamp(),
-  });
-};
-</script>
-
 <script type="importmap">
 {
   "imports": {
-    "three":          "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/":  "https://unpkg.com/three@0.160.0/examples/jsm/"
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
   }
 }
 </script>
@@ -338,24 +263,19 @@ let cartItems = [];
 try { cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]'); } catch(e) {}
 if (!cartItems.length) {
   cartItems = [
-    { id:'p1', name:'大腸麵線', price:60,  qty:1, emoji:'🍜', modelUrl:'big.glb' },
-    { id:'p3', name:'奶油',     price:50,  qty:2, emoji:'🧈', modelUrl:'keyboard.glb' },
-    { id:'p5', name:'巧克力',   price:65,  qty:1, emoji:'🍫', modelUrl:'watch.glb' },
+    { id:'p1', name:'大腸麵線', price:60,  qty:1, emoji:'🍜', modelUrl:'big.glb',      scale:1.4 },
+    { id:'p3', name:'奶油',     price:50,  qty:2, emoji:'🧈', modelUrl:'keyboard.glb', scale:4.0 },
+    { id:'p5', name:'巧克力',   price:65,  qty:1, emoji:'🍫', modelUrl:'watch.glb',    scale:4.0 },
   ];
 }
 
-/* ── Header 件數 ── */
 function renderHeaderMeta() {
   const el    = document.getElementById('header-meta');
   const count = cartItems.reduce((s, i) => s + i.qty, 0);
-  el.innerHTML = `
-    <span class="header-meta-count">${count}</span>
-    <span class="header-meta-label">件商品</span>
-  `;
+  el.innerHTML = `<span class="header-meta-count">${count}</span><span class="header-meta-label">件商品</span>`;
 }
 renderHeaderMeta();
 
-/* ── Bottom bar ── */
 function renderItemBar() {
   const bar = document.getElementById('item-bar');
   if (!cartItems.length) return;
@@ -376,7 +296,6 @@ function renderItemBar() {
 }
 renderItemBar();
 
-/* ── Modal ── */
 const modal       = document.getElementById('modal');
 const nameInput   = document.getElementById('name-input');
 const btnCheckout = document.getElementById('btn-checkout');
@@ -387,11 +306,9 @@ btnCheckout.addEventListener('click', () => {
   modal.classList.add('open');
   setTimeout(() => nameInput.focus(), 260);
 });
-
 document.getElementById('modal-cancel').addEventListener('click', () => modal.classList.remove('open'));
 modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
 nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('modal-confirm').click(); });
-
 document.getElementById('modal-confirm').addEventListener('click', () => {
   const name = nameInput.value.trim();
   if (!name) {
@@ -404,7 +321,6 @@ document.getElementById('modal-confirm').addEventListener('click', () => {
   doCheckout(name);
 });
 
-/* ── Three.js ── */
 const canvas = document.getElementById('c');
 const wrap   = document.getElementById('canvas-wrap');
 
@@ -424,7 +340,6 @@ function resize() {
 }
 
 const scene = new THREE.Scene();
-
 const camera = new THREE.PerspectiveCamera(38, 1, 0.001, 1000);
 camera.position.set(0, 4.5, -4.5);
 camera.lookAt(0, 0.8, 0);
@@ -481,11 +396,11 @@ function dropIn(group, initWorldPos, delayMs) {
 
 function placeItems(cartModel) {
   const BASKET_Y = 0.18;
-  const BW = 1, BH = 0.35, BD = 1;
+  const BW = 0.25, BH = 0.25, BD = 0.25;
   const slots = [
     [2.6,  -3.0],[2.15,-3.0],[1.72,-3.0],
-    [2.6,  -3.5],[2.1, -3.5],[1.6, -3.5],
-    [2.6,  -4.0],[2.1, -4.0],[1.1, -6.0],
+    [2.45,  -3.8],[1.95, -3.8],[1.5, -3.8],
+    [2.45,  -4.5],[2.1, -4.5],[1.1, -6.0],
   ];
   const slotStackH = {}, tasks = [];
   let si = 0;
@@ -511,9 +426,11 @@ function placeItems(cartModel) {
         const m = gltf.scene;
         const box   = new THREE.Box3().setFromObject(m);
         const size  = box.getSize(new THREE.Vector3());
-        const scale = Math.min(BW/size.x, BH/size.y, BD/size.z);
-        m.scale.setScalar(scale);
         const center = box.getCenter(new THREE.Vector3());
+        // ★ 套用與選購頁相同的 scale 倍率
+        const itemScale = item.scale ?? 1.0;
+        const scale = Math.min(BW/size.x, BH/size.y, BD/size.z) * itemScale;
+        m.scale.setScalar(scale);
         m.position.set(-center.x*scale, (-box.min.y)*scale, -center.z*scale);
         m.rotation.y = ci * 0.6;
         m.traverse(o => { if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
@@ -570,13 +487,11 @@ new GLTFLoader().load(CART_MODEL_URL, (gltf) => {
   placeItems(model);
 }, null, err => console.error('❌', err));
 
-/* ── 結帳 ── */
 const successMsg = document.getElementById('success-msg');
 
-async function doCheckout(customerName) {
+function doCheckout(customerName) {
   animRunning = true;
   btnCheckout.disabled = true;
-
   if (actions.length > 0) {
     actions.forEach(a => { a.reset(); a.paused=false; a.play(); });
     const dur = Math.max(...actions.map(a => a.getClip().duration)) * 1000;
@@ -584,10 +499,11 @@ async function doCheckout(customerName) {
   } else {
     setTimeout(showSuccess, 800);
   }
-
-  /* ★ 送訂單到 Firebase，fire-and-forget ★ */
-  try { await window._sendOrder(customerName, cartItems); }
-  catch(e) { console.warn('Firebase 寫入失敗', e); }
+  fetch('./order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: cartItems, customerName }),
+  }).catch(() => {});
 }
 
 function showSuccess() {
@@ -600,7 +516,6 @@ function showSuccess() {
   }, 2500);
 }
 
-/* ── Render loop ── */
 const clock  = new THREE.Clock();
 const _delta = new THREE.Vector3();
 
