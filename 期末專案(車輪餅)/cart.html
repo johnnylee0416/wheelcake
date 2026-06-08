@@ -194,6 +194,32 @@ canvas { display:block; width:100%!important; height:100%!important; }
   transition:background 0.15s, transform 0.15s;
 }
 .modal-confirm:hover { background:var(--ink-2); transform:translateY(-1px); }
+/* ── 音樂播放器 ── */
+.music-btn {
+  position:fixed; bottom:28px; right:28px; z-index:200;
+  width:46px; height:46px; border-radius:50%;
+  border:1px solid rgba(0,0,0,0.14);
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 4px 18px rgba(0,0,0,0.12);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s, transform 0.2s;
+  font-size:18px; color:var(--ink);
+}
+.music-btn:hover { background:rgba(255,255,255,0.95); transform:scale(1.08); }
+.music-btn.playing { background:var(--ink); color:#fff; }
+.music-label {
+  position:fixed; bottom:32px; right:82px; z-index:200;
+  background:rgba(255,255,255,0.80);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,0,0,0.10);
+  border-radius:50px; padding:7px 14px;
+  font-size:11px; color:var(--ink-3); letter-spacing:0.06em;
+  pointer-events:none; opacity:0;
+  transition:opacity 0.3s; white-space:nowrap;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+.music-label.show { opacity:1; }
 </style>
 </head>
 <body>
@@ -243,6 +269,10 @@ canvas { display:block; width:100%!important; height:100%!important; }
   <span style="color:var(--ink-4);font-size:13px;">購物車是空的</span>
 </div>
 
+<!-- 音樂播放器 -->
+<button class="music-btn" id="music-btn" title="播放 / 暫停背景音樂">♪</button>
+<div class="music-label" id="music-label">Calm Currents · HoliznaCC0 (CC0)</div>
+
 <script type="importmap">
 {
   "imports": {
@@ -253,9 +283,27 @@ canvas { display:block; width:100%!important; height:100%!important; }
 </script>
 
 <script type="module">
+// ── Firebase ──
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, Timestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── Three.js ──
 import * as THREE from 'three';
 import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ── Firebase 初始化 ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyD1WeeJoIxdGz9lOpk9zBGIr4jR50OLREs",
+  authDomain:        "hailua-orders.firebaseapp.com",
+  projectId:         "hailua-orders",
+  storageBucket:     "hailua-orders.firebasestorage.app",
+  messagingSenderId: "747213229698",
+  appId:             "1:747213229698:web:678e8eb1757c2fd30eae9b",
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
 
 const CART_MODEL_URL = './cart.glb';
 
@@ -296,6 +344,7 @@ function renderItemBar() {
 }
 renderItemBar();
 
+/* ── Modal ── */
 const modal       = document.getElementById('modal');
 const nameInput   = document.getElementById('name-input');
 const btnCheckout = document.getElementById('btn-checkout');
@@ -321,6 +370,7 @@ document.getElementById('modal-confirm').addEventListener('click', () => {
   doCheckout(name);
 });
 
+/* ── Three.js ── */
 const canvas = document.getElementById('c');
 const wrap   = document.getElementById('canvas-wrap');
 
@@ -399,8 +449,8 @@ function placeItems(cartModel) {
   const BW = 0.25, BH = 0.42, BD = 0.25;
   const slots = [
     [2.6,  -3.0],[2.15,-3.0],[1.72,-3.0],
-    [2.45,  -3.8],[1.95, -3.8],[1.5, -3.8],
-    [2.45,  -4.5],[2.1, -4.5],[1.1, -6.0],
+    [2.45, -3.8],[1.95,-3.8],[1.5, -3.8],
+    [2.45, -4.5],[2.1, -4.5],[1.1, -6.0],
   ];
   const slotStackH = {}, tasks = [];
   let si = 0;
@@ -424,10 +474,9 @@ function placeItems(cartModel) {
     if (item.modelUrl) {
       itemLoader.load(item.modelUrl, (gltf) => {
         const m = gltf.scene;
-        const box   = new THREE.Box3().setFromObject(m);
-        const size  = box.getSize(new THREE.Vector3());
+        const box    = new THREE.Box3().setFromObject(m);
+        const size   = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
-        // ★ 套用與選購頁相同的 scale 倍率
         const itemScale = item.scale ?? 1.0;
         const scale = Math.min(BW/size.x, BH/size.y, BD/size.z) * itemScale;
         m.scale.setScalar(scale);
@@ -485,13 +534,16 @@ new GLTFLoader().load(CART_MODEL_URL, (gltf) => {
     animNodeInitPos.setFromMatrixPosition(animNode.matrixWorld);
   }
   placeItems(model);
-}, null, err => console.error('❌', err));
+}, null, err => console.error('❌ cart.glb 載入失敗', err));
 
+/* ── 結帳：寫入 Firebase Firestore ── */
 const successMsg = document.getElementById('success-msg');
 
-function doCheckout(customerName) {
+async function doCheckout(customerName) {
   animRunning = true;
   btnCheckout.disabled = true;
+
+  // 播放購物車動畫
   if (actions.length > 0) {
     actions.forEach(a => { a.reset(); a.paused=false; a.play(); });
     const dur = Math.max(...actions.map(a => a.getClip().duration)) * 1000;
@@ -499,11 +551,25 @@ function doCheckout(customerName) {
   } else {
     setTimeout(showSuccess, 800);
   }
-  fetch('./Order.html', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items: cartItems, customerName }),
-  }).catch(() => {});
+
+  // ★ 寫入 Firestore
+  const total = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  try {
+    await addDoc(collection(db, 'orders'), {
+      name:  customerName,
+      items: cartItems.map(i => ({
+        name:  i.name,
+        emoji: i.emoji,
+        qty:   i.qty,
+        price: i.price,
+      })),
+      total,
+      done: false,
+      time: Timestamp.now(),
+    });
+  } catch(e) {
+    console.error('❌ Firebase 寫入失敗', e);
+  }
 }
 
 function showSuccess() {
@@ -516,6 +582,7 @@ function showSuccess() {
   }, 2500);
 }
 
+/* ── Render loop ── */
 const clock  = new THREE.Clock();
 const _delta = new THREE.Vector3();
 
@@ -539,6 +606,43 @@ const _delta = new THREE.Vector3();
 
 window.addEventListener('resize', resize);
 resize();
+
+/* ── 背景音樂 CC0 · HoliznaCC0 ── */
+(function(){
+  const btn   = document.getElementById('music-btn');
+  const label = document.getElementById('music-label');
+  const audio = new Audio();
+  audio.loop   = true;
+  audio.volume = 0.35;
+  audio.src = 'https://freemusicarchive.org/track/download/29551';
+
+  let playing = false, labelTimer;
+
+  function showLabel(ms) {
+    label.classList.add('show');
+    clearTimeout(labelTimer);
+    labelTimer = setTimeout(() => label.classList.remove('show'), ms || 2800);
+  }
+
+  btn.addEventListener('click', () => {
+    if (!playing) {
+      audio.play().then(() => {
+        playing = true;
+        btn.textContent = '♬';
+        btn.classList.add('playing');
+        showLabel(3000);
+      }).catch(() => {
+        label.textContent = '⚠ 載入失敗，請確認網路連線';
+        showLabel(2500);
+      });
+    } else {
+      audio.pause();
+      playing = false;
+      btn.textContent = '♪';
+      btn.classList.remove('playing');
+    }
+  });
+})();
 </script>
 </body>
 </html>
