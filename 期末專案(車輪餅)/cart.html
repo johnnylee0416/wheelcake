@@ -29,21 +29,6 @@ body {
   display:grid;
   grid-template-rows:auto 1fr auto;
 }
-#bg-video {
-  position:fixed; inset:0;
-  width:100%; height:100%;
-  object-fit:cover;
-  z-index:0;
-  opacity:0.50;
-  filter:grayscale(100%) contrast(1.1);
-}
-.overlay {
-  position:fixed; inset:0; z-index:1;
-  background:
-    radial-gradient(ellipse 70% 60% at 30% 50%, rgba(200,200,195,0.14) 0%, transparent 65%),
-    linear-gradient(160deg, rgba(245,244,241,0.10) 0%, rgba(245,244,241,0.55) 100%);
-  pointer-events:none;
-}
 header {
   position:relative; z-index:10;
   padding:18px 44px;
@@ -287,11 +272,6 @@ canvas { display:block; width:100%!important; height:100%!important; }
 </style>
 </head>
 <body>
-
-<video id="bg-video" autoplay muted loop playsinline>
-  <source src="./bg.mp4" type="video/mp4">
-</video>
-<div class="overlay"></div>
 
 <header>
   <a class="back-btn" href="./Shop.html" title="繼續選購">
