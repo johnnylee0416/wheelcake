@@ -220,6 +220,70 @@ canvas { display:block; width:100%!important; height:100%!important; }
   box-shadow:0 2px 12px rgba(0,0,0,0.08);
 }
 .music-label.show { opacity:1; }
+
+/* ════════════════════════════════════
+   RWD — 只加斷點，不改原有樣式
+   ════════════════════════════════════ */
+
+/* 平板（768px 以下） */
+@media (max-width: 768px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .canvas-wrap {
+    height: 55vw;
+    min-height: 280px;
+    max-height: 440px;
+  }
+
+  .bottom-bar {
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    overflow-x: visible;
+  }
+
+  .bar-spacer { display: none; }
+
+  .bar-total {
+    width: 100%;
+    border-left: none;
+    padding-left: 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  header { padding: 14px 20px; }
+
+  /* 音樂按鈕在平板往上移，避免壓到合計 */
+  .music-btn  { bottom: auto; top: 80px; }
+  .music-label { bottom: auto; top: 84px; }
+}
+
+/* 手機（480px 以下） */
+@media (max-width: 480px) {
+  .canvas-wrap {
+    height: 70vw;
+    max-height: none;
+  }
+
+  .header-title-sub { display: none; }
+  .header-meta { display: none; }
+
+  .hbtn { padding: 9px 16px; font-size: 12px; }
+
+  .modal-card {
+    width: calc(100vw - 40px);
+    padding: 28px 24px;
+  }
+
+  .bottom-bar { padding: 10px 16px; }
+
+  .item-chip { font-size: 12px; padding: 5px 10px 5px 8px; }
+}
 </style>
 </head>
 <body>
@@ -543,7 +607,6 @@ async function doCheckout(customerName) {
   animRunning = true;
   btnCheckout.disabled = true;
 
-  // 播放購物車動畫
   if (actions.length > 0) {
     actions.forEach(a => { a.reset(); a.paused=false; a.play(); });
     const dur = Math.max(...actions.map(a => a.getClip().duration)) * 1000;
@@ -552,7 +615,6 @@ async function doCheckout(customerName) {
     setTimeout(showSuccess, 800);
   }
 
-  // ★ 寫入 Firestore
   const total = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
   try {
     await addDoc(collection(db, 'orders'), {
